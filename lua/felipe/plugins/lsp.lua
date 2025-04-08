@@ -1,25 +1,35 @@
 return {
-    'neovim/nvim-lspconfig',
+    "neovim/nvim-lspconfig",
     dependencies = {
+        "stevearc/conform.nvim",
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
-        "WhoIsSethDaniel/mason-tool-installer",
         "hrsh7th/cmp-nvim-lsp",
         "hrsh7th/cmp-buffer",
         "hrsh7th/cmp-path",
         "hrsh7th/cmp-cmdline",
         "hrsh7th/nvim-cmp",
+        "onsails/lspkind.nvim",
         "L3MON4D3/LuaSnip",
         "saadparwaiz1/cmp_luasnip",
-        "onsails/lspkind.nvim",
         "j-hui/fidget.nvim",
     },
+
     config = function()
+        require("conform").setup({
+            formatters_by_ft = {
+            }
+        })
         local cmp = require('cmp')
         local cmp_lsp = require("cmp_nvim_lsp")
+        local capabilities = vim.tbl_deep_extend(
+            "force",
+            {},
+            vim.lsp.protocol.make_client_capabilities(),
+            cmp_lsp.default_capabilities())
 
         vim.api.nvim_create_autocmd('LspAttach', {
-            callback = function(args)
+            callback = function (args)
                 local bufnr = args.buf
                 local bufopts = { noremap = true, silent = true, buffer = bufnr }
                 local opts = { noremap = true, silent = true }
@@ -40,39 +50,32 @@ return {
             end,
         })
 
-        require("mason-tool-installer").setup({
-            ensure_installed = {
-                "java-debug-adapter",
-                "java-test"
-            }
-        })
-
-        local capabilities = vim.tbl_deep_extend(
-            "force",
-            {},
-            vim.lsp.protocol.make_client_capabilities(),
-            cmp_lsp.default_capabilities())
-
         require("fidget").setup({})
         require("mason").setup()
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",
-                "jdtls"
+                "rust_analyzer",
+                "gopls",
             },
             handlers = {
                 function(server_name) -- default handler (optional)
-                    require("lspconfig")[server_name].setup { capabilities = capabilities }
+                    require("lspconfig")[server_name].setup {
+                        capabilities = capabilities,
+                        --on_attach = on_attach,
+                    }
                 end,
-                ["jdtls"] = function () end,
+
+                ["jdtls"] =function () end,
                 ["lua_ls"] = function()
                     local lspconfig = require("lspconfig")
                     lspconfig.lua_ls.setup {
                         capabilities = capabilities,
                         settings = {
                             Lua = {
+                                runtime = { version = "Lua 5.1" },
                                 diagnostics = {
-                                    globals = { "vim", "it", "describe", "before_each", "after_each" },
+                                    globals = { "bit", "vim", "it", "describe", "before_each", "after_each" },
                                 }
                             }
                         }
@@ -82,7 +85,6 @@ return {
         })
 
         local cmp_select = { behavior = cmp.SelectBehavior.Select }
-        local lspkind = require("lspkind")
 
         cmp.setup({
             snippet = {
@@ -90,13 +92,11 @@ return {
                     require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
                 end,
             },
+            window = {
+                documentation = cmp.config.window.bordered(),
+            },
             formatting = {
-                format = lspkind.cmp_format({
-                    mode = 'symbol',
-                    maxwidth = 50,
-                    ellipsis_char = '...',
-                    show_labelDetails = true,
-                })
+                format = require("lspkind").cmp_format({mode = "symbol"}),
             },
             mapping = cmp.mapping.preset.insert({
                 ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
@@ -105,13 +105,16 @@ return {
                 ["<C-Space>"] = cmp.mapping.complete(),
             }),
             sources = cmp.config.sources({
+                { name = "copilot", group_index = 2 },
                 { name = 'nvim_lsp' },
                 { name = 'luasnip' }, -- For luasnip users.
             }, {
                     { name = 'buffer' },
                 })
         })
+
         vim.diagnostic.config({
+            -- update_in_insert = true,
             float = {
                 focusable = false,
                 style = "minimal",
@@ -122,5 +125,4 @@ return {
             },
         })
     end
-
 }

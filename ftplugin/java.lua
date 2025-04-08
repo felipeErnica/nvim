@@ -1,14 +1,15 @@
 local jdtls = require("jdtls")
+
 local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 capabilities.workspace = {
-    configuration = true,
-    didChangeWatchedFiles = {
-        dynamicRegistration = true
-    },
-    didChangeConfiguration = {
-        dynamicRegistration = true
-    }
+  configuration = true,
+  didChangeWatchedFiles = {
+    dynamicRegistration = true
+  },
+  didChangeConfiguration = {
+    dynamicRegistration = true
+  }
 }
 
 local on_attach = function(client, bufnr)
@@ -31,9 +32,11 @@ local on_attach = function(client, bufnr)
     vim.keymap.set('n', '<leader>xn', vim.diagnostic.goto_next, opts)
 end
 
-
 local config = {
-    cmd = { vim.fn.stdpath("data") .. "/mason/bin/jdtls"},
+    flags = {
+        allow_incremental_sync = true
+    },
+    cmd = { vim.fn.stdpath("data") .. "/mason/bin/jdtls.cmd"},
 
     root_dir = require("jdtls.setup").find_root({ 'gradlew', '.git', 'mvnw' }),
     on_attach = on_attach,
@@ -42,6 +45,7 @@ local config = {
     settings = {
         java = {
             signatureHelp = { enabled = true },
+            contentProvider = { preferred = 'fernflower' },
             sources = {
                 organizeImports = {
                     starThreshold = 9999,
@@ -59,10 +63,30 @@ local config = {
             },
         }
     },
+
+
     init_options = {
-        bundles = vim.fn.glob(vim.env.HOME .. '/local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin.jar')
+        bundles = vim.fn.glob(vim.env.HOME .. '/Local/nvim-data/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin.jar'),
     }
 }
+
+local cmp = require('cmp');
+
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['C-Space'] = cmp.mapping.complete(),
+    ['<CR>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'buffer' },
+  }),
+})
 
 config["on-attach"] = function(client, bufnr)
     jdtls.setup_dap({ hotcodereplace = 'auto'})
