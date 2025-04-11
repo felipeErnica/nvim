@@ -66,7 +66,7 @@ local config = {
 
 
     init_options = {
-        bundles = vim.fn.glob(vim.env.HOME .. '/Local/nvim-data/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin.jar'),
+        bundles = vim.fn.glob(vim.env.HOME .. '/.local/share/nvim/mason/share/java-debug-adapter/com.microsoft.java.debug.plugin.jar'),
     }
 }
 
