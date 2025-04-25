@@ -36,7 +36,7 @@ local config = {
     flags = {
         allow_incremental_sync = true
     },
-    cmd = { vim.fn.stdpath("data") .. "/mason/bin/jdtls.cmd"},
+    cmd = { vim.fn.stdpath("data") .. "/mason/bin/jdtls"},
 
     root_dir = require("jdtls.setup").find_root({ 'gradlew', '.git', 'mvnw' }),
     on_attach = on_attach,
