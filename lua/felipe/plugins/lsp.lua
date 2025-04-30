@@ -29,7 +29,7 @@ return {
             cmp_lsp.default_capabilities())
 
         vim.api.nvim_create_autocmd('LspAttach', {
-            callback = function (args)
+            callback = function(args)
                 local bufnr = args.buf
                 local bufopts = { noremap = true, silent = true, buffer = bufnr }
                 local opts = { noremap = true, silent = true }
@@ -66,7 +66,7 @@ return {
                     }
                 end,
 
-                ["jdtls"] =function () end,
+                ["jdtls"] = function() end,
                 ["lua_ls"] = function()
                     local lspconfig = require("lspconfig")
                     lspconfig.lua_ls.setup {
@@ -96,7 +96,7 @@ return {
                 documentation = cmp.config.window.bordered(),
             },
             formatting = {
-                format = require("lspkind").cmp_format({mode = "symbol"}),
+                format = require("lspkind").cmp_format({ mode = "symbol" }),
             },
             mapping = cmp.mapping.preset.insert({
                 ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
@@ -109,19 +109,23 @@ return {
                 { name = 'nvim_lsp' },
                 { name = 'luasnip' }, -- For luasnip users.
             }, {
-                    { name = 'buffer' },
-                })
+                { name = 'buffer' },
+            })
         })
 
         vim.diagnostic.config({
-            -- update_in_insert = true,
+            update_in_insert = true,
+            virtual_text = {
+                severity = nil,
+                format = nil,
+            },
             float = {
                 focusable = false,
                 style = "minimal",
                 border = "rounded",
                 source = "always",
                 header = "",
-                prefix = "",
+                prefix = ""
             },
         })
     end
