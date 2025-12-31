@@ -1,6 +1,9 @@
 return {
-    'nvim-telescope/telescope.nvim', tag = '0.1.8',
-    dependencies = { 'sharkdp/fd' },
+    'nvim-telescope/telescope.nvim',
+    dependencies = {
+        'nvim-lua/plenary.nvim',
+        { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+    },
     keys = function()
         local builtin = require('telescope.builtin')
         local keymap = vim.keymap
