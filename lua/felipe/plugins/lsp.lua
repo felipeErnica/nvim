@@ -28,7 +28,13 @@ return {
                 local bufnr = args.buf
                 local bufopts = { noremap = true, silent = true, buffer = bufnr }
                 local opts = { noremap = true, silent = true }
-                vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+                vim.keymap.set(
+                    'n',
+                    'K',
+                    function()
+                        vim.lsp.buf.hover({ border = "rounded" })
+                    end,
+                    bufopts)
                 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
                 vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
                 vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
@@ -102,7 +108,6 @@ return {
                     ellipsis_char = '...',
                     show_labelDetails = true,
                     before = function(entry, vim_item)
-
                         vim_item.abbr = string.format(" %s ", vim_item.abbr)
 
                         local source = ({
