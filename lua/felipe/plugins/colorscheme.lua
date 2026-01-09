@@ -7,7 +7,7 @@ return {
         require("gruvbox").setup({
             transparent_mode = true,
             overrides = {
-                NeoTreeTitleBar = { fg = "#282828", bg = "#fbf1c7"}
+                NeoTreeTitleBar = { fg = "#282828", bg = "#fbf1c7" }
             }
         })
         vim.o.background = "dark"

@@ -1,7 +1,6 @@
 return {
     "neovim/nvim-lspconfig",
     dependencies = {
-        "stevearc/conform.nvim",
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
         "hrsh7th/cmp-nvim-lsp",
@@ -16,10 +15,6 @@ return {
     },
 
     config = function()
-        require("conform").setup({
-            formatters_by_ft = {
-            }
-        })
         local cmp = require('cmp')
         local cmp_lsp = require("cmp_nvim_lsp")
         local capabilities = vim.tbl_deep_extend(
@@ -93,10 +88,32 @@ return {
                 end,
             },
             window = {
-                documentation = cmp.config.window.bordered(),
+                completion = cmp.config.window.bordered({ border = "rounded" }),
+                documentation = cmp.config.window.bordered({ border = "rounded" }),
             },
             formatting = {
-                format = require("lspkind").cmp_format({ mode = "symbol" }),
+                fields = { "abbr", "kind", "menu" },
+                format = require('lspkind').cmp_format({
+                    mode = 'symbol_text',
+                    maxwidth = {
+                        abbr = 50, -- actual suggestion item
+                        menu = 50
+                    },
+                    ellipsis_char = '...',
+                    show_labelDetails = true,
+                    before = function(entry, vim_item)
+
+                        vim_item.abbr = string.format(" %s ", vim_item.abbr)
+
+                        local source = ({
+                            buffer = "[Buf]",
+                            nvim_lsp = "[LSP]",
+                            luasnip = "[LuaSnip]",
+                        })[entry.source.name]
+                        vim_item.menu = " " .. source .. " "
+                        return vim_item
+                    end,
+                })
             },
             mapping = cmp.mapping.preset.insert({
                 ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
@@ -114,7 +131,7 @@ return {
                     else
                         fallback()
                     end
-                end, {"i","s","c",}),
+                end, { "i", "s", "c", }),
             }),
             sources = cmp.config.sources({
                 { name = "copilot", group_index = 2 },
